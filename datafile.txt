@@ -1,0 +1,21 @@
+The format of the data files for the instances is:
+
+|I||J|
+a_1 b_1
+a_2 b_2
+...
+x_|J| y_|J|
+x_1 y_1 z_1
+x_1 y_2 z_1
+...
+x_|I| y_|I| z_|I|
+
+where:
+
+|I| is the set of demand nodes
+|J| is the set of possible facilities
+a_j (j=1,...,|J|) coordinates of the x axis for the possible facilities
+b_j (j=1,...,|J|) coordinates of the y axis for the possible facilities
+x_i (i=1,...,|I|) coordinates of the x axis for the demand nodes
+y_i (i=1,...,|I|) coordinates of the y axis for the demand nodes
+z_i (i=1,...,|I|) value of the demand nodes
