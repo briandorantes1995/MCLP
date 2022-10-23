@@ -4,12 +4,11 @@ import time
 
 
 
-if not sys.argv:
-    instance = "in100-1.csv"
-else:
-    print("\nYou choose this instance:" + sys.argv[1])
-    instance = str(sys.argv[1])
+
+instance = "in30-1.csv"
+
 
 time_start = time.perf_counter()
-df = pd.read_csv(instance)
+df = pd.read_csv(instance,sep='\r')
+    
 print(df)

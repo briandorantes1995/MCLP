@@ -41,6 +41,8 @@ for i in range(0, instances):
     ys = pd.DataFrame(data=y)
     zs = pd.DataFrame(data=z)
     df = pd.concat([xs, ys, zs], axis=1, sort=False)
+    with open(name, mode='a') as file_:
+     file_.write("\r")  # Next line.
     df.to_csv(name, mode='a', index=False, header=False)
 
 
