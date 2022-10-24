@@ -32,7 +32,7 @@ for i in range(0, instances):
     xposibles= pd.DataFrame(data=xposible)
     yposibles= pd.DataFrame(data=yposible)
     posiblelocationcoords = pd.concat([xposibles, yposibles], axis=1, sort=False)
-    name = "in" + str(locations) + "-" + str(i+1) + ".csv"
+    name = "inp" + str(locations) + "-" + str(i+1) + ".csv"
     posiblelocationcoords.to_csv(name, index=False, header=False)
     x = np.random.randint(minx, maxx, locations)
     y = np.random.randint(miny, maxy, locations)
@@ -41,9 +41,8 @@ for i in range(0, instances):
     ys = pd.DataFrame(data=y)
     zs = pd.DataFrame(data=z)
     df = pd.concat([xs, ys, zs], axis=1, sort=False)
-    with open(name, mode='a') as file_:
-     file_.write("\r")  # Next line.
-    df.to_csv(name, mode='a', index=False, header=False)
+    name2 = "inc" + str(locations) + "-" + str(i+1) + ".csv"
+    df.to_csv(name2,index=False, header=False)
 
 
 time_elapsed = (time.perf_counter() - time_start)
