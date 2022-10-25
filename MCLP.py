@@ -26,8 +26,8 @@ costumers.rename(columns={0: 'X', 1: 'Y', 2: 'Demand'}, inplace=True)
 costumers.index += 1
 costumerscoords = costumers[['X','Y']]
 
-maximumdistance = input("Enter the maximum distance in meters for the node to be covered(meters)")
-facilities = input("Enter the facilities to be placed in the available locations")
+maximumdistance = int(input("Enter the maximum distance in meters for the node to be covered(meters)"))
+facilities = int(input("Enter the facilities to be placed in the available locations"))
 # Compute distances 
 
 dist2 = euclidean_distances(posiblelocations, costumerscoords)
@@ -36,6 +36,11 @@ dist2 = euclidean_distances(posiblelocations, costumerscoords)
 
 df2 = pd.DataFrame( dist2, columns=costumers.index, index=posiblelocations.index)
 
-given_set = {maximumdistance}
-df2['coverednodes'] = df2.isin(given_set).sum(1)
+# Start the heuristic
+df2['coverednodes'] = df2[df2 >= maximumdistance].count(1)
+
+# This does the sorting, by covered nodes(it maximizes the covered nodes)
+df2.sort_values(by=['coverednodes'], ascending=False, inplace=True)
+
+df2.to_csv("prueba.csv",index=False, header=False)
 print(df2.head())
