@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 import time
 from sklearn.metrics.pairwise import euclidean_distances
+import numpy as np
 
 if not sys.argv:
     instance = "inc50-1.csv"
@@ -26,21 +27,41 @@ costumers.rename(columns={0: 'X', 1: 'Y', 2: 'Demand'}, inplace=True)
 costumers.index += 1
 costumerscoords = costumers[['X','Y']]
 
+# Ask for constraints
 maximumdistance = int(input("Enter the maximum distance in meters for the node to be covered(meters)"))
 facilities = int(input("Enter the facilities to be placed in the available locations"))
+
 # Compute distances 
 
 dist2 = euclidean_distances(posiblelocations, costumerscoords)
 
 # Convert back to dataframe.
 
-df2 = pd.DataFrame( dist2, columns=costumers.index, index=posiblelocations.index)
+df = pd.DataFrame( dist2, columns=costumers.index, index=posiblelocations.index)
 
 # Start the heuristic
-df2['coverednodes'] = df2[df2 >= maximumdistance].count(1)
+df['coverednodes'] = df[df >= maximumdistance].count(1)
 
 # This does the sorting, by covered nodes(it maximizes the covered nodes)
-df2.sort_values(by=['coverednodes'], ascending=False, inplace=True)
+df.sort_values(by=['coverednodes'], ascending=False, inplace=True)
 
-df2.to_csv("prueba.csv",index=False, header=False)
-print(df2.head())
+dfheuristic = df.iloc[:facilities]
+
+
+# Selected locations
+ 
+selectedlocations = list(dfheuristic.index.values)
+
+  
+# Binary Path
+for i in range(facilities):
+    for j in range(n):
+        g = np.where(dfheuristic.iloc[i, j] >= maximumdistance, True, False)
+        if g:
+            dfheuristic.iloc[i, j] = 1
+        else:
+            dfheuristic.iloc[i, j] = 0
+ 
+dfheuristic.loc['Total',:]= dfheuristic.sum(axis=0)
+               
+print(dfheuristic)
