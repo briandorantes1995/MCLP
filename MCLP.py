@@ -9,16 +9,11 @@ import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = [7.50, 3.50]
 plt.rcParams["figure.autolayout"] = True
 
-if not sys.argv:
-    instance = "inc50-1.csv"
-    instance2 = "inp50-1.csv"
-else:
-    print("\nYou choose this instance:" + sys.argv[1])
-    instance = str(sys.argv[1])
-    instance2 = str(sys.argv[2])
-    
+instance = "inc50-1.csv"
+instance2 = "inp50-1.csv"
 
-#Initialize the final results
+
+# Initialize the final results
 totalcoverednodes = 0
 totalpopulationserved = 0
 
@@ -32,22 +27,24 @@ posiblelocations.rename(columns={info[0]: 'X', info[1]: 'Y'}, inplace=True)
 posiblelocations.index += 1
 
 
-costumers = pd.read_csv(instance,header=None)
+costumers = pd.read_csv(instance, header=None)
 costumers.rename(columns={0: 'X', 1: 'Y', 2: 'Demand'}, inplace=True)
 costumers.index += 1
-costumerscoords = costumers[['X','Y']]
+costumerscoords = costumers[['X', 'Y']]
 
 # Ask for constraints
-maximumdistance = int(input("Enter the maximum distance in meters for the node to be covered(meters)"))
-facilities = int(input("Enter the facilities to be placed in the available locations"))
+maximumdistance = int(
+    input("Enter the maximum distance in meters for the node to be covered(meters)"))
+facilities = int(
+    input("Enter the facilities to be placed in the available locations"))
 
-# Compute distances 
+# Compute distances
 
 dist2 = euclidean_distances(posiblelocations, costumerscoords)
 
 # Convert back to dataframe.
 
-df = pd.DataFrame( dist2, columns=costumers.index, index=posiblelocations.index)
+df = pd.DataFrame(dist2, columns=costumers.index, index=posiblelocations.index)
 
 # Start the heuristic
 df['coverednodes'] = df[df <= maximumdistance].count(1)
@@ -60,20 +57,24 @@ dfheuristic = df.iloc[:facilities]
 
 # Initial Plot
 
-plt.plot(costumers['X'].values.tolist(),costumers['Y'].values.tolist(),'r.', label='Demanded Nodes')
-plt.plot(posiblelocations['X'].values.tolist(),posiblelocations['Y'].values.tolist(),'b*', label='Available Facilities')
-plt.title( 'MCLP-Initial State' )
+plt.plot(costumers['X'].values.tolist(),
+         costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+plt.plot(posiblelocations['X'].values.tolist(
+), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
+plt.title('MCLP-Initial State')
 plt.legend(loc="upper left")
 plt.show()
 
 # Selected locations
- 
+
 selectedlocations = list(dfheuristic.index.values)
 
 # Final Plot
-plt.plot(costumers['X'].values.tolist(),costumers['Y'].values.tolist(),'r.', label='Demanded Nodes')
-plt.plot(posiblelocations.loc[selectedlocations,'X'].values.tolist(),posiblelocations.loc[selectedlocations,'Y'].values.tolist(),'b*', label='Selected Facilities')
-plt.title( 'MCLP-Heuristic Result' )
+plt.plot(costumers['X'].values.tolist(),
+         costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+plt.plot(posiblelocations.loc[selectedlocations, 'X'].values.tolist(
+), posiblelocations.loc[selectedlocations, 'Y'].values.tolist(), 'b*', label='Selected Facilities')
+plt.title('MCLP-Heuristic Result')
 plt.legend(loc="upper left")
 plt.show()
 
@@ -85,31 +86,30 @@ for i in range(facilities):
             dfheuristic.iloc[i, j] = 1
         else:
             dfheuristic.iloc[i, j] = 0
- 
-dfheuristic.loc['Total',:] = dfheuristic.sum(axis=0)
-dfheuristic[dfheuristic.iloc[-1:] > 1 ] = 1
-Binary = dfheuristic.loc['Total',:].values.tolist()   
-Binary = Binary[:-1] 
-costumers['Binary'] =Binary
+
+dfheuristic.loc['Total', :] = dfheuristic.sum(axis=0)
+dfheuristic[dfheuristic.iloc[-1:] > 1] = 1
+Binary = dfheuristic.loc['Total', :].values.tolist()
+Binary = Binary[:-1]
+costumers['Binary'] = Binary
 
 
-#Final Result of the heuristic
-for j in range(1,n):
-    z = np.where(costumers.loc[j,'Binary'] == 1, True, False)
+# Final Result of the heuristic
+for j in range(1, n):
+    z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
     if z:
         totalcoverednodes += 1
-        totalpopulationserved += costumers.loc[j,'Demand']
-        
-# Get the index of the node covered
-indexofnodes = costumers[costumers['Binary']== 1].index.values
+        totalpopulationserved += costumers.loc[j, 'Demand']
 
-#print all the results
-print("\nThe used locationes are :",selectedlocations)
+# Get the index of the node covered
+indexofnodes = costumers[costumers['Binary'] == 1].index.values
+
+# print all the results
+print("\nThe used locationes are :", selectedlocations)
 print("\nThere are "+str(totalcoverednodes)+" nodes covered\n")
-print('\nThis are the covered nodes: ',indexofnodes)
-print("\nThe covered population is :",totalpopulationserved)
+print('\nThis are the covered nodes: ', indexofnodes)
+print("\nThe covered population is :", totalpopulationserved)
 
 # print runtime
 time_elapsed = (time.perf_counter() - time_start)
 print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
-    
