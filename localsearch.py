@@ -9,16 +9,28 @@ from MCLP import posiblelocations, n, costumerscoords, costumers, maximumdistanc
 from itertools import combinations
 
 
+time_start = time.perf_counter()
+
 dist2 = euclidean_distances(posiblelocations, costumerscoords)
 
 # Convert back to dataframe.
 df = pd.DataFrame(dist2, columns=costumers.index, index=posiblelocations.index)
-
 df['coverednodes'] = df[df <= maximumdistance].count(1)
 df.sort_values(by=['coverednodes'], ascending=False, inplace=True)
-# This does the sorting, by covered nodes(it maximizes the covered nodes)
 
 dfheuristic = df.iloc[:facilities]
+
+
+def initialPlot():
+    print("*************************")
+    print("Initial plot")
+    plt.plot(costumers['X'].values.tolist(
+    ), costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+    plt.plot(posiblelocations['X'].values.tolist(
+    ), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
+    plt.title('MCLP-Initial State')
+    plt.legend(loc="upper left")
+    plt.show()
 
 
 def outputText(selectedlocations, totalcoverednodes, indexofnodes, totalpopulationserved):
@@ -56,7 +68,6 @@ def binary(x, y):
 
     # Get the index of the node covered
     indexofnodes = costumers[costumers['Binary'] == 1].index.values
-    #outputText(selectedlocations, totalcoverednodes, indexofnodes,totalpopulationserved)
     return [selectedlocations, totalcoverednodes, indexofnodes, totalpopulationserved]
 
 
@@ -91,6 +102,7 @@ def firstFoundStrategy():
             first_found = possibleChanges.iloc[x]
 
     outputText(first_found[0], first_found[1], first_found[2], first_found[3])
+    finalPlot(first_found, "First Found Strategy")
     print("*************************")
 
 
@@ -106,9 +118,21 @@ def bestFoundStrategy():
     max_value_info = possibleChanges.iloc[max_value_index]
     outputText(max_value_info[0], max_value_info[1],
                max_value_info[2], max_value_info[3])
+    finalPlot(max_value_info, "Best Found Strategy")
     print("*************************")
 
 
+def finalPlot(value_info, title):
+    plt.plot(costumers['X'].values.tolist(
+    ), costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+    plt.plot(posiblelocations.loc[list(value_info[0]), 'X'].values.tolist(), posiblelocations.loc[list(
+        value_info[0]), 'Y'].values.tolist(), 'b*', label='Available Facilities')
+    plt.title(title)
+    plt.legend(loc="upper left")
+    plt.show()
+
+
+initialPlot()
 exitOption = False
 while exitOption == False:
     print("Local Search")
@@ -127,3 +151,6 @@ while exitOption == False:
         bestFoundStrategy()
     else:
         exitOption = True
+
+time_elapsed = (time.perf_counter() - time_start)
+print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
