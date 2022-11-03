@@ -9,9 +9,13 @@ import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = [7.50, 3.50]
 plt.rcParams["figure.autolayout"] = True
 
-instance = "inc50-1.csv"
-instance2 = "inp50-1.csv"
-
+if not sys.argv:
+    instance = "inc50-1.csv"
+    instance2 = "inp50-1.csv"
+else:
+    print("\nYou choose this instance:" + sys.argv[1])
+    instance = str(sys.argv[1])
+    instance2 = str(sys.argv[2])
 
 # Initialize the final results
 totalcoverednodes = 0
