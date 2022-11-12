@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 # Initialize the plot
 plt.rcParams["figure.figsize"] = [7.50, 3.50]
 plt.rcParams["figure.autolayout"] = True
+fig, ax = plt.subplots()
 
 if not sys.argv:
     instance = "inc50-1.csv"
@@ -85,7 +86,7 @@ plt.show()
 # Binary Path
 for i in range(facilities):
     for j in range(n):
-        g = np.where(dfheuristic.iloc[i, j] >= maximumdistance, True, False)
+        g = np.where(dfheuristic.iloc[i, j] <= maximumdistance, True, False)
         if g:
             dfheuristic.iloc[i, j] = 1
         else:
@@ -98,9 +99,16 @@ Binary = Binary[:-1]
 costumers['Binary'] = Binary
 
 
+<<<<<<< HEAD
+
+#Final Result of the heuristic
+for j in range(1,n):
+    z = np.where(costumers.loc[j,'Binary'] == 1, True, False)
+=======
 # Final Result of the heuristic
 for j in range(1, n):
     z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
+>>>>>>> refs/remotes/origin/main
     if z:
         totalcoverednodes += 1
         totalpopulationserved += costumers.loc[j, 'Demand']
