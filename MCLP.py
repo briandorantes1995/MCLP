@@ -57,6 +57,8 @@ df['coverednodes'] = df[df <= maximumdistance].count(1)
 # This does the sorting, by covered nodes(it maximizes the covered nodes)
 df.sort_values(by=['coverednodes'], ascending=False, inplace=True)
 
+df_copy = df.copy()
+
 dfheuristic = df.iloc[:facilities]
 
 
@@ -99,16 +101,9 @@ Binary = Binary[:-1]
 costumers['Binary'] = Binary
 
 
-<<<<<<< HEAD
-
-#Final Result of the heuristic
-for j in range(1,n):
-    z = np.where(costumers.loc[j,'Binary'] == 1, True, False)
-=======
 # Final Result of the heuristic
 for j in range(1, n):
     z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
->>>>>>> refs/remotes/origin/main
     if z:
         totalcoverednodes += 1
         totalpopulationserved += costumers.loc[j, 'Demand']
