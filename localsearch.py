@@ -133,6 +133,7 @@ class localsearch():
         return possibleChanges
 
 
+localClass = localsearch()
 exitOption = False
 while exitOption == False:
     print("Local Search")
