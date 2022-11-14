@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import collections
 from MCLP import df_copy, n, m, costumers, posiblelocations, maximumdistance, facilities, totalpopulationserved
+
 from itertools import combinations
 import warnings
 warnings.filterwarnings("ignore")
@@ -12,14 +13,19 @@ warnings.filterwarnings("ignore")
 time_start = time.perf_counter()
 
 
-df_heuristic = df_copy.copy()
-for i in range(m):
+# Convert back to dataframe.
+
+
+df_binary = df_copy.copy()
+originalCostumers = costumers.copy()
+df_binary = df_binary[df_binary["coverednodes"] > 0]
+for i in range(len(df_binary)):
     for j in range(n):
-        g = np.where(df_heuristic.iloc[i, j] <= maximumdistance, True, False)
+        g = np.where(df_binary.iloc[i, j] <= maximumdistance, True, False)
         if g:
-            df_heuristic.iloc[i, j] = 1
+            df_binary.iloc[i, j] = 1
         else:
-            df_heuristic.iloc[i, j] = 0
+            df_binary.iloc[i, j] = 0
 
 
 class localsearch():
@@ -28,8 +34,8 @@ class localsearch():
     def initialPlot():
         print("*************************")
         print("Initial plot")
-        plt.plot(costumers['X'].values.tolist(
-        ), costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+        plt.plot(originalCostumers['X'].values.tolist(
+        ), originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
         plt.plot(posiblelocations['X'].values.tolist(
         ), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
         plt.title('MCLP-Initial State')
@@ -38,8 +44,8 @@ class localsearch():
 
     @staticmethod
     def finalPlot(value_info, title):
-        plt.plot(costumers['X'].values.tolist(
-        ), costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+        plt.plot(originalCostumers['X'].values.tolist(
+        ), originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
         plt.plot(posiblelocations.loc[list(value_info[0]), 'X'].values.tolist(), posiblelocations.loc[list(
             value_info[0]), 'Y'].values.tolist(), 'b*', label='Available Facilities')
         plt.title(title)
@@ -56,7 +62,6 @@ class localsearch():
     def firstFoundStrategy(self):
         print("*************************")
         print("First Found Strategy")
-        global possibleChanges
         possibleChanges = self.choosePossibleChanges()
         max_value = max(possibleChanges["totalpopulation"])
         if max_value <= totalpopulationserved:
@@ -95,8 +100,8 @@ class localsearch():
 
     @staticmethod
     def checkEachCombination(coords):
+        global aprueba
         df_coombination = df_heuristic.loc[coords]
-        selectedlocations = list(df_coombination.index.values)
         df_coombination.loc['Total', :] = df_coombination.sum(axis=0)
         df_coombination[df_coombination.iloc[-1:] > 1] = 1
 
@@ -104,36 +109,67 @@ class localsearch():
         costumers['Binary'] = Binary[:-1]
         totalcoverednodes = 0
         totalpopulation = 0
-        for j in range(1, n):
+        for j in range(1, len(costumers.index)):
             z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
             if z:
                 totalcoverednodes += 1
                 totalpopulation += costumers.loc[j, 'Demand']
 
+# Get the index of the node covered
         indexofnodes = costumers[costumers['Binary'] == 1].index.values
-        return [selectedlocations, totalcoverednodes, indexofnodes, totalpopulation]
+
+        return [coords, totalcoverednodes, indexofnodes, totalpopulation]
 
     def choosePossibleChanges(self):
-        global combinations_list
+        global possibleChanges
+        global lastIndex
+        global new_combination_list
         populationsandfactories = []
         combinations_list = list(combinations(
             df_heuristic.index.values, facilities))
+        i = 0
+        lastIndex = 0
+        while (i < facilities):
+            i = i + 1
+            lastIndex = lastIndex + (len(df_heuristic.index) - i)
 
-        for x in combinations_list:
+        new_combination_list = []
+        for x in range(lastIndex):
+            new_combination_list.append(combinations_list[x])
+
+        for x in new_combination_list:
             selectedlocations, totalcoverednodes, indexofnodes, totalpopulation = self.checkEachCombination(
                 list(x))
-            if collections.Counter(list(df_heuristic.index.values)) == collections.Counter(selectedlocations):
-                continue
+
             populationsandfactories.append(
                 [selectedlocations, totalcoverednodes, indexofnodes, totalpopulation])
 
         possibleChanges = pd.DataFrame(data=populationsandfactories, columns=[
-            "selectedlocations", "totalcoverednodes", "indexofnodes", "totalpopulation"])
+            "selectedlocations", "totalcoverednodes",  "indexofnodes", "totalpopulation"])
 
         return possibleChanges
 
 
 localClass = localsearch()
+localClass.initialPlot()
+if (len(df_binary) < facilities):
+    print("localsearch can´t improve current solution")
+
+df_heuristic = df_binary.copy()
+for x in range(len(df_heuristic.columns)):
+    if x == 0:
+        continue
+    if ((df_heuristic[x] == 0).all()):
+        df_heuristic.drop(x, inplace=True, axis=1)
+        costumers.drop(labels=[x], inplace=True, axis=0)
+
+
+costumers.index = np.arange(1, len(costumers) + 1)
+df_heuristic.columns = range(1, len(df_heuristic.columns)+1)
+df_heuristic.rename(
+    columns={int(len(df_heuristic.columns)): 'coverednodes'}, inplace=True)
+
+
 exitOption = False
 while exitOption == False:
     print("Local Search")

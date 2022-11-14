@@ -13,7 +13,7 @@ fig, ax = plt.subplots()
 if not sys.argv:
     instance = "inc50-1.csv"
     instance2 = "inp50-1.csv"
-else:
+
     print("\nYou choose this instance:" + sys.argv[1])
     instance = str(sys.argv[1])
     instance2 = str(sys.argv[2])
