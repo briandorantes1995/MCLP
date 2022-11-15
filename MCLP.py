@@ -13,7 +13,7 @@ fig, ax = plt.subplots()
 if not sys.argv:
     instance = "inc50-1.csv"
     instance2 = "inp50-1.csv"
-else:
+
     print("\nYou choose this instance:" + sys.argv[1])
     instance = str(sys.argv[1])
     instance2 = str(sys.argv[2])
@@ -54,6 +54,8 @@ df['coverednodes'] = df[df <= maximumdistance].count(1)
 
 # This does the sorting, by covered nodes(it maximizes the covered nodes)
 df.sort_values(by=['coverednodes'], ascending=False, inplace=True)
+
+df_copy = df.copy()
 
 dfheuristic = df.iloc[:facilities]
 
@@ -97,7 +99,10 @@ Binary = Binary[:-1]
 costumers['Binary'] = Binary
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5d6443086697133eb188986321c75400ff0ef06a
 # Final Result of the heuristic
 for j in range(1, n):
     z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
