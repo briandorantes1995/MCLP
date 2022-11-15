@@ -38,10 +38,8 @@ costumers.index += 1
 costumerscoords = costumers[['X', 'Y']]
 
 # Ask for constraints
-maximumdistance = int(
-    input("Enter the maximum distance in meters for the node to be covered(meters)"))
-facilities = int(
-    input("Enter the facilities to be placed in the available locations"))
+maximumdistance = int(input("Enter the maximum distance in meters for the node to be covered(meters):"))
+facilities = int(input("Enter how many facilities will be placed in the available locations(there are "+str(m)+" available):"))
 
 # Compute distances
 
@@ -99,16 +97,10 @@ Binary = Binary[:-1]
 costumers['Binary'] = Binary
 
 
-<<<<<<< HEAD
 
-#Final Result of the heuristic
-for j in range(1,n):
-    z = np.where(costumers.loc[j,'Binary'] == 1, True, False)
-=======
 # Final Result of the heuristic
 for j in range(1, n):
     z = np.where(costumers.loc[j, 'Binary'] == 1, True, False)
->>>>>>> refs/remotes/origin/main
     if z:
         totalcoverednodes += 1
         totalpopulationserved += costumers.loc[j, 'Demand']
@@ -117,7 +109,7 @@ for j in range(1, n):
 indexofnodes = costumers[costumers['Binary'] == 1].index.values
 
 # print all the results
-print("\nThe used locationes are :", selectedlocations)
+print("\nThe used locations are :", selectedlocations)
 print("\nThere are "+str(totalcoverednodes)+" nodes covered\n")
 print('\nThis are the covered nodes: ', indexofnodes)
 print("\nThe covered population is :", totalpopulationserved)
