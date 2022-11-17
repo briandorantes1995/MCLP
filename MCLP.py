@@ -8,16 +8,23 @@ import matplotlib.pyplot as plt
 # Initialize the plot
 plt.rcParams["figure.figsize"] = [7.50, 3.50]
 plt.rcParams["figure.autolayout"] = True
-fig, ax = plt.subplots()
 
-if not sys.argv:
+instance = ""
+instance2 = ""
+instances_quantity = int(
+    input("Enter the number of instances 1)50 2)1000 3)10000 4)100000"))
+if (instances_quantity) == 1:
     instance = "inc50-1.csv"
     instance2 = "inp50-1.csv"
-
-    print("\nYou choose this instance:" + sys.argv[1])
-    instance = str(sys.argv[1])
-    instance2 = str(sys.argv[2])
-
+elif (instances_quantity) == 2:
+    instance = "inc1000-1.csv"
+    instance2 = "inp1000-1.csv"
+elif (instances_quantity) == 3:
+    instance = "inc10000-1.csv"
+    instance2 = "inp10000-1.csv"
+elif (instances_quantity) == 4:
+    instance = "inc100000-1.csv"
+    instance2 = "inp100000-1.csv"
 # Initialize the final results
 totalcoverednodes = 0
 totalpopulationserved = 0
@@ -37,11 +44,10 @@ costumers.rename(columns={0: 'X', 1: 'Y', 2: 'Demand'}, inplace=True)
 costumers.index += 1
 costumerscoords = costumers[['X', 'Y']]
 
-# Ask for constraints
 maximumdistance = int(
     input("Enter the maximum distance in meters for the node to be covered(meters)"))
-facilities = int(
-    input("Enter the facilities to be placed in the available locations"))
+facilities = int(input(
+    "Enter how many facilities will be placed in the available locations(there are "+str(m)+" available facilities"))
 
 # Compute distances
 
@@ -77,10 +83,29 @@ plt.show()
 selectedlocations = list(dfheuristic.index.values)
 
 # Final Plot
-plt.plot(costumers['X'].values.tolist(),
-         costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
-plt.plot(posiblelocations.loc[selectedlocations, 'X'].values.tolist(
-), posiblelocations.loc[selectedlocations, 'Y'].values.tolist(), 'b*', label='Selected Facilities')
+
+
+posiblelocationsX = posiblelocations.loc[selectedlocations, 'X'].values.tolist(
+)
+posiblelocationsY = posiblelocations.loc[selectedlocations, 'Y'].values.tolist(
+)
+
+
+fig, ax = plt.subplots()
+ax.plot(costumers['X'].values.tolist(),
+        costumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+ax.plot(posiblelocations['X'].values.tolist(
+), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
+ax.plot(posiblelocations.loc[selectedlocations, 'X'].values.tolist(
+), posiblelocations.loc[selectedlocations, 'Y'].values.tolist(), 'g*', label='Selected Facilities')
+
+for i, data in enumerate(zip(posiblelocationsX, posiblelocationsY)):
+
+    j, k = data
+    ax.add_patch(plt.Circle((j, k), maximumdistance, color='green', alpha=0.5))
+
+ax.set_aspect('equal')
+ax.plot()
 plt.title('MCLP-Heuristic Result')
 plt.legend(loc="upper left")
 plt.show()
@@ -112,7 +137,7 @@ for j in range(1, n):
 indexofnodes = costumers[costumers['Binary'] == 1].index.values
 
 # print all the results
-print("\nThe used locationes are :", selectedlocations)
+print("\nThe used locations are :", selectedlocations)
 print("\nThere are "+str(totalcoverednodes)+" nodes covered\n")
 print('\nThis are the covered nodes: ', indexofnodes)
 print("\nThe covered population is :", totalpopulationserved)

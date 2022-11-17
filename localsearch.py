@@ -4,16 +4,13 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import collections
-from MCLP import df_copy, n, m, costumers, posiblelocations, maximumdistance, facilities, totalpopulationserved
+from MCLP import df_copy, n, m, costumers, posiblelocations, maximumdistance, facilities, totalpopulationserved, costumerscoords, selectedlocations, posiblelocationsX, posiblelocationsY
 
 from itertools import combinations
 import warnings
 warnings.filterwarnings("ignore")
 
 time_start = time.perf_counter()
-
-
-# Convert back to dataframe.
 
 
 df_binary = df_copy.copy()
@@ -32,22 +29,53 @@ class localsearch():
 
     @staticmethod
     def initialPlot():
-        print("*************************")
-        print("Initial plot")
-        plt.plot(originalCostumers['X'].values.tolist(
-        ), originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
-        plt.plot(posiblelocations['X'].values.tolist(
+        fig, ax = plt.subplots()
+        ax.plot(originalCostumers['X'].values.tolist(),
+                originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+        ax.plot(posiblelocations['X'].values.tolist(
         ), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
-        plt.title('MCLP-Initial State')
+        ax.plot(posiblelocations.loc[selectedlocations, 'X'].values.tolist(
+        ), posiblelocations.loc[selectedlocations, 'Y'].values.tolist(), 'g*', label='Selected Facilities')
+
+        for i, data in enumerate(zip(posiblelocationsX, posiblelocationsY)):
+
+            j, k = data
+            ax.add_patch(plt.Circle((j, k), maximumdistance,
+                         color='green', alpha=0.5))
+
+        ax.set_aspect('equal')
+        ax.plot()
+        plt.title('MCLP-Heuristic Result')
         plt.legend(loc="upper left")
         plt.show()
 
     @staticmethod
     def finalPlot(value_info, title):
-        plt.plot(originalCostumers['X'].values.tolist(
-        ), originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
-        plt.plot(posiblelocations.loc[list(value_info[0]), 'X'].values.tolist(), posiblelocations.loc[list(
-            value_info[0]), 'Y'].values.tolist(), 'b*', label='Available Facilities')
+        global aprueba
+        aprueba = value_info
+        fig, ax = plt.subplots()
+        ax.plot(originalCostumers['X'].values.tolist(),
+                originalCostumers['Y'].values.tolist(), 'r.', label='Demanded Nodes')
+        ax.plot(posiblelocations['X'].values.tolist(
+        ), posiblelocations['Y'].values.tolist(), 'b*', label='Available Facilities')
+        ax.plot(posiblelocations.loc[list(value_info[0]), 'X'].values.tolist(), posiblelocations.loc[list(
+            value_info[0]), 'Y'].values.tolist(), 'g*', label='Available Facilities')
+
+        posiblelocationsX = posiblelocations.loc[list(
+            value_info[0]), 'X'].values.tolist()
+        posiblelocationsY = posiblelocations.loc[list(
+            value_info[0]), 'Y'].values.tolist()
+        for i, data in enumerate(zip(posiblelocationsX, posiblelocationsY)):
+
+            j, k = data
+            ax.add_patch(plt.Circle((j, k), maximumdistance,
+                         color='green', alpha=0.5))
+
+        ax.set_aspect('equal')
+        ax.plot()
+
+        # plt.plot(posiblelocations.loc[list(value_info[0]), 'X'].values.tolist(), posiblelocations.loc[list(
+        #     value_info[0]), 'Y'].values.tolist(), 'b*', label='Available Facilities')
         plt.title(title)
         plt.legend(loc="upper left")
         plt.show()
@@ -57,7 +85,9 @@ class localsearch():
         print("\nThe used locationes are :", selectedlocations)
         print("\nThere are "+str(totalcoverednodes)+" nodes covered\n")
         print('\nThis are the covered nodes: ', indexofnodes)
-        print("\nThe covered population is :", totalpopulation)
+        print("\nThe covered population is :",  totalpopulation)
+        print("\nThe improvement is :", (totalpopulation /
+              totalpopulationserved) * 100 - 100, "%")
 
     def firstFoundStrategy(self):
         print("*************************")
@@ -83,7 +113,6 @@ class localsearch():
     def bestFoundStrategy(self):
         print("*************************")
         print("Best Found Strategy")
-        global posiblelocations
         possibleChanges = self.choosePossibleChanges()
         max_value = max(possibleChanges["totalpopulation"])
         if max_value <= totalpopulationserved:
