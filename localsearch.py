@@ -11,8 +11,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 time_start = time.perf_counter()
-
-
 df_binary = df_copy.copy()
 originalCostumers = costumers.copy()
 df_binary = df_binary[df_binary["coverednodes"] > 0]
@@ -93,9 +91,15 @@ class localsearch():
         print("*************************")
         print("First Found Strategy")
         possibleChanges = self.choosePossibleChanges()
-        max_value = max(possibleChanges["totalpopulation"])
+        try:
+            max_value = max(possibleChanges["totalpopulation"])
+        except ValueError:
+            max_value = 0
+
         if max_value <= totalpopulationserved:
             print("First Found strategy can not provide a better solution")
+            time_elapsed = (time.perf_counter() - time_start)
+            print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
             print("*************************")
             return
 
@@ -107,16 +111,24 @@ class localsearch():
 
         self.outputText(first_found[0], first_found[1],
                         first_found[2], first_found[3])
+        time_elapsed = (time.perf_counter() - time_start)
+        print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
         self.finalPlot(first_found, "First Found Strategy")
+
         print("*************************")
 
     def bestFoundStrategy(self):
         print("*************************")
         print("Best Found Strategy")
         possibleChanges = self.choosePossibleChanges()
-        max_value = max(possibleChanges["totalpopulation"])
+        try:
+            max_value = max(possibleChanges["totalpopulation"])
+        except ValueError:
+            max_value = 0
         if max_value <= totalpopulationserved:
             print("Best Found strategy can not provide a better solution")
+            time_elapsed = (time.perf_counter() - time_start)
+            print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
             print("*************************")
             return
 
@@ -124,7 +136,10 @@ class localsearch():
         max_value_info = possibleChanges.iloc[max_value_index]
         self.outputText(max_value_info[0], max_value_info[1],
                         max_value_info[2], max_value_info[3])
+        time_elapsed = (time.perf_counter() - time_start)
+        print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
         self.finalPlot(max_value_info, "Best Found Strategy")
+
         print("*************************")
 
     @staticmethod
@@ -218,6 +233,3 @@ while exitOption == False:
         localClass.bestFoundStrategy()
     else:
         exitOption = True
-
-time_elapsed = (time.perf_counter() - time_start)
-print(f"\n\nRuntime of the Heuristic is:{time_elapsed}")
